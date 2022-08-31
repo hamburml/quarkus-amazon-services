@@ -1,4 +1,4 @@
-package io.quarkus.it.amazon.dynamodb;
+package io.quarkus.it.amazon.dynamodbenhanced;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbBean;

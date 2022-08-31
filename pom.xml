@@ -17,6 +17,7 @@
         <module>cognito-user-pools</module>
         <module>common</module>
         <module>dynamodb</module>
+        <module>dynamodb-enhanced</module>
         <module>iam</module>
         <module>s3</module>
         <module>sns</module>

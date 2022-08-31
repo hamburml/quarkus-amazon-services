@@ -1,4 +1,4 @@
-package io.quarkus.it.amazon.dynamodb;
+package io.quarkus.it.amazon.dynamodbenhanced;
 
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
 
@@ -13,8 +13,6 @@ import javax.ws.rs.Produces;
 import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @Path("/dynamodbenhanced")
 public class DynamoDBEnhancedResource {
@@ -24,10 +22,10 @@ public class DynamoDBEnhancedResource {
     private static final Logger LOG = Logger.getLogger(DynamoDBEnhancedResource.class);
 
     @Inject
-    DynamoDbClient dynamoClient;
+    DynamoDbEnhancedClient dynamoEnhancedClient;
 
     @Inject
-    DynamoDbAsyncClient dynamoAsyncClient;
+    DynamoDbEnhancedAsyncClient dynamoEnhancedAsyncClient;
 
     @GET
     @Path("async")
@@ -36,10 +34,7 @@ public class DynamoDBEnhancedResource {
         LOG.info("Testing Async Dynamodb client with table: " + ASYNC_TABLE);
         String partitionKeyAsString = UUID.randomUUID().toString();
 
-        DynamoDbEnhancedAsyncClient enhancedAsyncClient = DynamoDbEnhancedAsyncClient.builder()
-                .dynamoDbClient(dynamoAsyncClient).build();
-
-        DynamoDbAsyncTable<DynamoDBExampleTableEntry> exampleAsyncTable = enhancedAsyncClient.table(ASYNC_TABLE,
+        DynamoDbAsyncTable<DynamoDBExampleTableEntry> exampleAsyncTable = dynamoEnhancedAsyncClient.table(ASYNC_TABLE,
                 TableSchema.fromBean(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
@@ -64,9 +59,7 @@ public class DynamoDBEnhancedResource {
 
         String partitionKeyAsString = UUID.randomUUID().toString();
 
-        DynamoDbEnhancedClient enhancedClient = DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoClient).build();
-
-        DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = enhancedClient.table(BLOCKING_TABLE,
+        DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
                 TableSchema.fromBean(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();

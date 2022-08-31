@@ -4,35 +4,26 @@
 
     <parent>
         <groupId>io.quarkiverse.amazonservices</groupId>
-        <artifactId>quarkus-amazon-dynamodb-parent</artifactId>
+        <artifactId>quarkus-amazon-dynamodb-enhanced-parent</artifactId>
         <version>999-SNAPSHOT</version>
     </parent>
 
-    <artifactId>quarkus-amazon-dynamodb</artifactId>
-    <name>Quarkus - Amazon Services - DynamoDB - Runtime</name>
-    <description>Connect to Amazon DynamoDB datastore</description>
+    <artifactId>quarkus-amazon-dynamodb-enhanced</artifactId>
+    <name>Quarkus - Amazon Services - DynamoDB Enhanced - Runtime</name>
+    <description>Connect to Amazon DynamoDB datastore via DynamoDB Enhanced Client</description>
 
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
             <artifactId>quarkus-arc</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-netty</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>io.quarkiverse.amazonservices</groupId>
             <artifactId>quarkus-amazon-common</artifactId>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
-            <artifactId>dynamodb</artifactId>
+            <artifactId>dynamodb-enhanced</artifactId>
             <exclusions>
                 <!-- we exclude them here because we want to make them optional -->
                 <exclusion>
@@ -50,38 +41,28 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>netty-nio-client</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>url-connection-client</artifactId>
-            <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>apache-client</artifactId>
-            <optional>true</optional>
-            <exclusions>
-                <exclusion>
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jboss.logging</groupId>
-            <artifactId>commons-logging-jboss-logging</artifactId>
+            <groupId>org.graalvm.nativeimage</groupId>
+            <artifactId>svm</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
+                <version>${quarkus.version}</version>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>extension-descriptor</goal>
+                        </goals>
+                        <configuration>
+                            <deployment>${project.groupId}:${project.artifactId}-deployment:${project.version}</deployment>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
