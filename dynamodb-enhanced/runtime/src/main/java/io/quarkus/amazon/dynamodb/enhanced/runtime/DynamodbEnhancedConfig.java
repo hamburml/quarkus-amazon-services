@@ -1,16 +1,13 @@
 package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
-import io.quarkus.amazon.common.runtime.AwsConfig;
-import io.quarkus.amazon.common.runtime.NettyHttpClientConfig;
-import io.quarkus.amazon.common.runtime.SdkConfig;
-import io.quarkus.amazon.common.runtime.SyncHttpClientConfig;
+import io.quarkus.amazon.common.runtime.*;
 import io.quarkus.runtime.annotations.ConfigDocSection;
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;
 import io.quarkus.runtime.annotations.ConfigRoot;
 
 @ConfigRoot(name = "dynamodb-enhanced", phase = ConfigPhase.RUN_TIME)
-public class DynamodbConfig {
+public class DynamodbEnhancedConfig {
 
     /**
      * Enable DynamoDB service endpoint discovery.
@@ -45,4 +42,8 @@ public class DynamodbConfig {
     @ConfigItem
     @ConfigDocSection
     public NettyHttpClientConfig asyncClient;
+
+    /** Apply patch for crashing tests. Reduces performance in JVM mode. */
+    @ConfigItem(defaultValue = "true")
+    public boolean jvmTransformation;
 }

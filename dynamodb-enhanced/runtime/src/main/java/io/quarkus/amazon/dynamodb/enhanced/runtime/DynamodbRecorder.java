@@ -1,13 +1,11 @@
 package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
-import io.quarkus.amazon.common.runtime.AwsConfig;
-import io.quarkus.amazon.common.runtime.NettyHttpClientConfig;
-import io.quarkus.amazon.common.runtime.SdkConfig;
-import io.quarkus.amazon.common.runtime.SyncHttpClientConfig;
+import io.quarkus.amazon.common.runtime.*;
 import io.quarkus.runtime.RuntimeValue;
 import io.quarkus.runtime.annotations.Recorder;
-import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.core.client.config.SdkAdvancedAsyncClientOption;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
+import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
@@ -18,9 +16,9 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 @Recorder
 public class DynamodbRecorder {
 
-    final DynamodbConfig config;
+    final DynamodbEnhancedConfig config;
 
-    public DynamodbRecorder(DynamodbConfig config) {
+    public DynamodbRecorder(DynamodbEnhancedConfig config) {
         this.config = config;
     }
 
@@ -40,28 +38,39 @@ public class DynamodbRecorder {
         return new RuntimeValue<>(config.sdk);
     }
 
-    public RuntimeValue<AwsClientBuilder> createSyncBuilder(RuntimeValue<SdkHttpClient.Builder> transport) {
-        DynamoDbClientBuilder builder = DynamoDbClient.builder();
-        builder.endpointDiscoveryEnabled(config.enableEndpointDiscovery);
+    public RuntimeValue<DynamoDbEnhancedClient.Builder> createSyncBuilder(RuntimeValue<SdkHttpClient.Builder> transport) {
+
+        DynamoDbEnhancedClient.Builder builder = DynamoDbEnhancedClient.builder();
+
+        DynamoDbClientBuilder builderDynamoDb = DynamoDbClient.builder();
+        builderDynamoDb.endpointDiscoveryEnabled(config.enableEndpointDiscovery);
 
         if (transport != null) {
-            builder.httpClientBuilder(transport.getValue());
+            builderDynamoDb.httpClientBuilder(transport.getValue());
         }
+
+        builder.dynamoDbClient(builderDynamoDb.build());
+
         return new RuntimeValue<>(builder);
     }
 
-    public RuntimeValue<AwsClientBuilder> createAsyncBuilder(RuntimeValue<SdkAsyncHttpClient.Builder> transport) {
+    public RuntimeValue<DynamoDbEnhancedAsyncClient.Builder> createAsyncBuilder(
+            RuntimeValue<SdkAsyncHttpClient.Builder> transport) {
 
-        DynamoDbAsyncClientBuilder builder = DynamoDbAsyncClient.builder();
-        builder.endpointDiscoveryEnabled(config.enableEndpointDiscovery);
+        DynamoDbEnhancedAsyncClient.Builder builderAsync = DynamoDbEnhancedAsyncClient.builder();
+
+        DynamoDbAsyncClientBuilder builderAsyncDynamoDb = DynamoDbAsyncClient.builder();
+        builderAsyncDynamoDb.endpointDiscoveryEnabled(config.enableEndpointDiscovery);
 
         if (transport != null) {
-            builder.httpClientBuilder(transport.getValue());
+            builderAsyncDynamoDb.httpClientBuilder(transport.getValue());
         }
         if (!config.asyncClient.advanced.useFutureCompletionThreadPool) {
-            builder.asyncConfiguration(asyncConfigBuilder -> asyncConfigBuilder
+            builderAsyncDynamoDb.asyncConfiguration(asyncConfigBuilder -> asyncConfigBuilder
                     .advancedOption(SdkAdvancedAsyncClientOption.FUTURE_COMPLETION_EXECUTOR, Runnable::run));
         }
-        return new RuntimeValue<>(builder);
+        builderAsync.dynamoDbClient(builderAsyncDynamoDb.build());
+
+        return new RuntimeValue<>(builderAsync);
     }
 }

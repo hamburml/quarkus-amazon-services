@@ -17,7 +17,9 @@ public class DynamodbEnhancedClientProducer {
     DynamodbEnhancedClientProducer(Instance<DynamoDbEnhancedClient.Builder> syncClientBuilderInstance,
             Instance<DynamoDbEnhancedAsyncClient.Builder> asyncClientBuilderInstance) {
         this.syncClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
+        //this.syncClient = DynamoDbEnhancedClient.create(); // TODO maybe also possible?
         this.asyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build() : null;
+        //this.asyncClient = DynamoDbEnhancedAsyncClient.create(); // TODO maybe also possible?
     }
 
     @Produces
@@ -41,6 +43,7 @@ public class DynamodbEnhancedClientProducer {
 
     @PreDestroy
     public void destroy() {
+        // TODO the enhancedClient does not have a close
         /*
          * if (syncClient != null) {
          * syncClient.close();
