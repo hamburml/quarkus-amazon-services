@@ -16,10 +16,10 @@ public class DynamodbEnhancedClientProducer {
 
     DynamodbEnhancedClientProducer(Instance<DynamoDbEnhancedClient.Builder> syncClientBuilderInstance,
             Instance<DynamoDbEnhancedAsyncClient.Builder> asyncClientBuilderInstance) {
+
         this.syncClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
-        //this.syncClient = DynamoDbEnhancedClient.create(); // TODO maybe also possible?
         this.asyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build() : null;
-        //this.asyncClient = DynamoDbEnhancedAsyncClient.create(); // TODO maybe also possible?
+
     }
 
     @Produces

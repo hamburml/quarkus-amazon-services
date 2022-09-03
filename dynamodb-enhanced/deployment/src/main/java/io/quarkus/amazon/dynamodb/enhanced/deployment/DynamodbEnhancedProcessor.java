@@ -15,7 +15,6 @@ import io.quarkus.amazon.common.runtime.AmazonClientUrlConnectionTransportRecord
 import io.quarkus.amazon.dynamodb.enhanced.BeanTableSchemaSubstitutionImplementation;
 import io.quarkus.amazon.dynamodb.enhanced.runtime.DynamodbEnhancedBuildTimeConfig;
 import io.quarkus.amazon.dynamodb.enhanced.runtime.DynamodbEnhancedClientProducer;
-import io.quarkus.amazon.dynamodb.enhanced.runtime.DynamodbEnhancedConfig;
 import io.quarkus.amazon.dynamodb.enhanced.runtime.DynamodbRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
 import io.quarkus.arc.deployment.BeanRegistrationPhaseBuildItem;
@@ -27,10 +26,8 @@ import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.BytecodeTransformerBuildItem;
 import io.quarkus.deployment.builditem.ExtensionSslNativeSupportBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
-import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem;
 import io.quarkus.gizmo.Gizmo;
-import io.quarkus.runtime.LaunchMode;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 
@@ -47,7 +44,7 @@ public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
 
     @Override
     protected String configName() {
-        return "dynamodb";
+        return "dynamodb-enhanced";
     }
 
     @Override
@@ -67,22 +64,24 @@ public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
 
     public static final String CLASS_NAME_BEAN_TABLE_SCHEMA = "software.amazon.awssdk.enhanced.dynamodb.mapper.BeanTableSchema";
 
-    @BuildStep
-    void maybeApplyClassTransformation(
-            DynamodbEnhancedConfig buildTimeConfig,
-            BuildProducer<BytecodeTransformerBuildItem> transformers,
-            LaunchModeBuildItem launchModeBuildItem) {
-        if (shouldApplyClassTransformation(buildTimeConfig, launchModeBuildItem)) {
-            applyClassTransformation(transformers);
-        }
-    }
-
-    private boolean shouldApplyClassTransformation(
-            DynamodbEnhancedConfig buildTimeConfig, LaunchModeBuildItem launchModeBuildItem) {
-        return buildTimeConfig.jvmTransformation
-                && launchModeBuildItem.getLaunchMode() != LaunchMode.NORMAL;
-    }
-
+    /*
+     * @BuildStep
+     * void maybeApplyClassTransformation(
+     * DynamodbEnhancedConfig buildTimeConfig,
+     * BuildProducer<BytecodeTransformerBuildItem> transformers,
+     * LaunchModeBuildItem launchModeBuildItem) {
+     * if (shouldApplyClassTransformation(buildTimeConfig, launchModeBuildItem)) {
+     * applyClassTransformation(transformers);
+     * }
+     * }
+     *
+     * @BuildStep
+     * private boolean shouldApplyClassTransformation(
+     * DynamodbEnhancedConfig buildTimeConfig, LaunchModeBuildItem launchModeBuildItem) {
+     * return buildTimeConfig.jvmTransformation
+     * && launchModeBuildItem.getLaunchMode() != LaunchMode.NORMAL;
+     * }
+     */
     private void applyClassTransformation(BuildProducer<BytecodeTransformerBuildItem> transformers) {
         transformers.produce(
                 new BytecodeTransformerBuildItem(
@@ -268,21 +267,19 @@ public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
             List<AmazonClientAsyncTransportBuildItem> asyncTransports,
             BuildProducer<SyntheticBeanBuildItem> syntheticBeans) {
 
-        // TODO this does not work
-        /*
-         * createClientBuilders(commonRecorder,
-         * recorder.getAwsConfig(),
-         * recorder.getSdkConfig(),
-         * buildTimeConfig.sdk,
-         * syncTransports,
-         * asyncTransports,
-         * DynamoDbEnhancedClient.Builder.class,
-         * (syncTransport) -> recorder.createSyncBuilder(syncTransport),
-         * DynamoDbEnhancedAsyncClient.Builder.class,
-         * (asyncTransport) -> recorder.createAsyncBuilder(asyncTransport),
-         * null,
-         * null,
-         * syntheticBeans);
-         */
+        createClientBuilders2(commonRecorder,
+                recorder.getAwsConfig(),
+                recorder.getSdkConfig(),
+                buildTimeConfig.sdk,
+                syncTransports,
+                asyncTransports,
+                DynamoDbEnhancedClient.Builder.class,
+                (syncTransport) -> recorder.createSyncBuilder(syncTransport),
+                DynamoDbEnhancedAsyncClient.Builder.class,
+                (asyncTransport) -> recorder.createAsyncBuilder(asyncTransport),
+                null,
+                null,
+                syntheticBeans);
+
     }
 }
