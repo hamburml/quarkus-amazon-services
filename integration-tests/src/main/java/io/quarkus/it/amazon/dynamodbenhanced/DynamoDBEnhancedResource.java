@@ -13,6 +13,7 @@ import javax.ws.rs.Produces;
 import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
 
 @Path("/dynamodbenhanced")
 public class DynamoDBEnhancedResource {
@@ -60,16 +61,19 @@ public class DynamoDBEnhancedResource {
         String partitionKeyAsString = UUID.randomUUID().toString();
 
         DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
-                TableSchema.fromBean(DynamoDBExampleTableEntry.class));
+                TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
         exampleTableEntry.setTablePartitionKey(partitionKeyAsString);
+        exampleTableEntry.setName("TESTSTRING");
 
         Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
         exampleBlockingTable.putItem(exampleTableEntry);
 
-        DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(partitionKey);
+        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().key(partitionKey).build();
+
+        DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(request);
 
         if (existingTableEntry != null) {
             return existingTableEntry.getTablePartitionKey();

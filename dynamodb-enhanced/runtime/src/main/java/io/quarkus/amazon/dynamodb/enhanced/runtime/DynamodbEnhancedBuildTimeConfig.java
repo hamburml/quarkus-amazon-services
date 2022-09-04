@@ -19,4 +19,8 @@ public class DynamodbEnhancedBuildTimeConfig {
      */
     @ConfigItem
     public SyncHttpClientBuildTimeConfig syncClient;
+
+    /** Apply patch for crashing tests. Reduces performance in JVM mode. */
+    @ConfigItem(defaultValue = "true")
+    public boolean jvmTransformation;
 }

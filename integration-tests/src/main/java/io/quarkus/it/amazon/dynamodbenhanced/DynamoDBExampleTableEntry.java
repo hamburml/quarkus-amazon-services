@@ -10,6 +10,8 @@ public class DynamoDBExampleTableEntry {
 
     private String tablePartitionKey;
 
+    private String name;
+
     @DynamoDbPartitionKey
     public String getTablePartitionKey() {
         return tablePartitionKey;
@@ -17,5 +19,13 @@ public class DynamoDBExampleTableEntry {
 
     public void setTablePartitionKey(String partitionKey) {
         this.tablePartitionKey = partitionKey;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

@@ -7,6 +7,10 @@ import javax.enterprise.inject.Produces;
 
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 
 @ApplicationScoped
 public class DynamodbEnhancedClientProducer {
@@ -14,11 +18,15 @@ public class DynamodbEnhancedClientProducer {
     private final DynamoDbEnhancedClient syncClient;
     private final DynamoDbEnhancedAsyncClient asyncClient;
 
-    DynamodbEnhancedClientProducer(Instance<DynamoDbEnhancedClient.Builder> syncClientBuilderInstance,
-            Instance<DynamoDbEnhancedAsyncClient.Builder> asyncClientBuilderInstance) {
+    DynamodbEnhancedClientProducer(Instance<DynamoDbClientBuilder> syncClientBuilderInstance,
+            Instance<DynamoDbAsyncClientBuilder> asyncClientBuilderInstance) {
 
-        this.syncClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
-        this.asyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build() : null;
+        DynamoDbClient syncClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
+        DynamoDbAsyncClient asyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build()
+                : null;
+
+        this.syncClient = DynamoDbEnhancedClient.builder().dynamoDbClient(syncClient).build();
+        this.asyncClient = DynamoDbEnhancedAsyncClient.builder().dynamoDbClient(asyncClient).build();
 
     }
 

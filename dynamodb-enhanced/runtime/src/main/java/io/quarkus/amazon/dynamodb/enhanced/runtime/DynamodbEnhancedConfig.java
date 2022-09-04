@@ -43,7 +43,4 @@ public class DynamodbEnhancedConfig {
     @ConfigDocSection
     public NettyHttpClientConfig asyncClient;
 
-    /** Apply patch for crashing tests. Reduces performance in JVM mode. */
-    @ConfigItem(defaultValue = "true")
-    public boolean jvmTransformation;
 }
