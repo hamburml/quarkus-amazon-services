@@ -20,6 +20,8 @@ public class DynamoDBEnhancedResource {
     private final static String ASYNC_TABLE = "async";
     private final static String BLOCKING_TABLE = "blocking";
 
+    private final static String PAYLOAD_VALUE = "OK";
+
     private static final Logger LOG = Logger.getLogger(DynamoDBEnhancedResource.class);
 
     @Inject
@@ -36,16 +38,17 @@ public class DynamoDBEnhancedResource {
         String partitionKeyAsString = UUID.randomUUID().toString();
 
         DynamoDbAsyncTable<DynamoDBExampleTableEntry> exampleAsyncTable = dynamoEnhancedAsyncClient.table(ASYNC_TABLE,
-                TableSchema.fromBean(DynamoDBExampleTableEntry.class));
+                TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
-        exampleTableEntry.setTablePartitionKey(partitionKeyAsString);
+        exampleTableEntry.setId(partitionKeyAsString);
+        exampleTableEntry.setPayload(PAYLOAD_VALUE);
 
         Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
         return exampleAsyncTable.putItem(exampleTableEntry)
                 .thenCompose(t -> exampleAsyncTable.getItem(partitionKey))
-                .thenApply(p -> p.getTablePartitionKey())
+                .thenApply(p -> p.getPayload())
                 .exceptionally(th -> {
                     LOG.error("Error during async Dynamodb operations", th.getCause());
                     return "ERROR";
@@ -64,8 +67,8 @@ public class DynamoDBEnhancedResource {
                 TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
-        exampleTableEntry.setTablePartitionKey(partitionKeyAsString);
-        exampleTableEntry.setName("TESTSTRING");
+        exampleTableEntry.setId(partitionKeyAsString);
+        exampleTableEntry.setPayload(PAYLOAD_VALUE);
 
         Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
@@ -76,7 +79,7 @@ public class DynamoDBEnhancedResource {
         DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(request);
 
         if (existingTableEntry != null) {
-            return existingTableEntry.getTablePartitionKey();
+            return existingTableEntry.getPayload();
         } else {
             return "ERROR";
         }

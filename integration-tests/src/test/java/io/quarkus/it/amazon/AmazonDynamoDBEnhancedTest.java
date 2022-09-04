@@ -12,7 +12,7 @@ public class AmazonDynamoDBEnhancedTest {
 
     @Test
     public void testDynamoDbAsync() {
-        //RestAssured.when().get("/test/dynamodbenhanced/async").then().body(is("INTERCEPTED OK"));
+        RestAssured.when().get("/test/dynamodbenhanced/async").then().body(is("INTERCEPTED OK"));
     }
 
     @Test
