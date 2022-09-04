@@ -34,11 +34,6 @@
             </dependency>
             <dependency>
                 <groupId>io.quarkiverse.amazonservices</groupId>
-                <artifactId>quarkus-amazon-dynamodb</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.quarkiverse.amazonservices</groupId>
                 <artifactId>quarkus-amazon-dynamodb-deployment</artifactId>
                 <version>${project.version}</version>
             </dependency>

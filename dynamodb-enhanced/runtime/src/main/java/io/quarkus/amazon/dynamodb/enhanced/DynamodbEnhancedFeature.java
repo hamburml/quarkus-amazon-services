@@ -28,6 +28,7 @@ public class DynamodbEnhancedFeature implements Feature {
             RuntimeReflection.register(DefaultAttributeConverterProvider.class.getConstructor());
             RuntimeReflection.register(BeanTableSchemaAttributeTags.class);
             RuntimeReflection.register(BeanTableSchemaAttributeTags.class.getMethods());
+
         } catch (NoSuchMethodException ex) {
             throw new IllegalStateException(
                     "SVM Substitution: Unable to register method for reflection", ex);

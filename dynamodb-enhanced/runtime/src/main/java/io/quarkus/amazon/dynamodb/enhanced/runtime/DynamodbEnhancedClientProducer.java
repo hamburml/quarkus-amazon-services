@@ -15,50 +15,74 @@ import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 @ApplicationScoped
 public class DynamodbEnhancedClientProducer {
 
-    private final DynamoDbEnhancedClient syncClient;
-    private final DynamoDbEnhancedAsyncClient asyncClient;
+    private final DynamoDbClient dynamoDbClient;
+    private final DynamoDbAsyncClient dynamoDbAsyncClient;
+    private final DynamoDbEnhancedClient dynamoDbEnhancedClient;
+    private final DynamoDbEnhancedAsyncClient dynamoDbEnhancedAsyncClient;
 
     DynamodbEnhancedClientProducer(Instance<DynamoDbClientBuilder> syncClientBuilderInstance,
             Instance<DynamoDbAsyncClientBuilder> asyncClientBuilderInstance) {
 
-        DynamoDbClient syncClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
-        DynamoDbAsyncClient asyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build()
+        this.dynamoDbClient = syncClientBuilderInstance.isResolvable() ? syncClientBuilderInstance.get().build() : null;
+        this.dynamoDbAsyncClient = asyncClientBuilderInstance.isResolvable() ? asyncClientBuilderInstance.get().build()
                 : null;
 
-        this.syncClient = DynamoDbEnhancedClient.builder().dynamoDbClient(syncClient).build();
-        this.asyncClient = DynamoDbEnhancedAsyncClient.builder().dynamoDbClient(asyncClient).build();
+        this.dynamoDbEnhancedClient = this.dynamoDbClient != null
+                ? DynamoDbEnhancedClient.builder().dynamoDbClient(dynamoDbClient).build()
+                : null;
+        this.dynamoDbEnhancedAsyncClient = this.dynamoDbAsyncClient != null
+                ? DynamoDbEnhancedAsyncClient.builder().dynamoDbClient(dynamoDbAsyncClient).build()
+                : null;
 
     }
 
     @Produces
     @ApplicationScoped
-    public DynamoDbEnhancedClient client() {
-        if (syncClient == null) {
+    public DynamoDbClient client() {
+        if (dynamoDbClient == null) {
+            throw new IllegalStateException("The DynamoDbClient is required but has not been detected/configured.");
+        }
+        return dynamoDbClient;
+    }
+
+    @Produces
+    @ApplicationScoped
+    public DynamoDbAsyncClient clientAsync() {
+        if (dynamoDbAsyncClient == null) {
+            throw new IllegalStateException(
+                    "The DynamoDbAsyncClient is required but has not been detected/configured.");
+        }
+        return dynamoDbAsyncClient;
+    }
+
+    @Produces
+    @ApplicationScoped
+    public DynamoDbEnhancedClient enhancedClient() {
+        if (dynamoDbEnhancedClient == null) {
             throw new IllegalStateException("The DynamoDbEnhancedClient is required but has not been detected/configured.");
         }
-        return syncClient;
+        return dynamoDbEnhancedClient;
     }
 
     @Produces
     @ApplicationScoped
-    public DynamoDbEnhancedAsyncClient asyncClient() {
-        if (asyncClient == null) {
+    public DynamoDbEnhancedAsyncClient asyncEnhancedClient() {
+        if (dynamoDbEnhancedAsyncClient == null) {
             throw new IllegalStateException(
                     "The DynamoDbEnhancedAsyncClient is required but has not been detected/configured.");
         }
-        return asyncClient;
+        return dynamoDbEnhancedAsyncClient;
     }
 
     @PreDestroy
     public void destroy() {
-        // TODO the enhancedClient does not have a close
-        /*
-         * if (syncClient != null) {
-         * syncClient.close();
-         * }
-         * if (asyncClient != null) {
-         * asyncClient.close();
-         * }
-         */
+
+        if (dynamoDbClient != null) {
+            dynamoDbClient.close();
+        }
+        if (dynamoDbAsyncClient != null) {
+            dynamoDbAsyncClient.close();
+        }
+
     }
 }

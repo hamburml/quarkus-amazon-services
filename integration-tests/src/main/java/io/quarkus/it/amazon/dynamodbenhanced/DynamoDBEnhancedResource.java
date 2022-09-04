@@ -13,16 +13,17 @@ import javax.ws.rs.Produces;
 import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.enhanced.dynamodb.model.GetItemEnhancedRequest;
 
 @Path("/dynamodbenhanced")
 public class DynamoDBEnhancedResource {
-    private final static String ASYNC_TABLE = "async";
-    private final static String BLOCKING_TABLE = "blocking";
+    private final static String ASYNC_TABLE = "enhancedasync";
+    private final static String BLOCKING_TABLE = "enhancedblocking";
 
     private final static String PAYLOAD_VALUE = "OK";
 
     private static final Logger LOG = Logger.getLogger(DynamoDBEnhancedResource.class);
+
+    private static final int DEFAULT_WAIT_INTERVAL = 1800;
 
     @Inject
     DynamoDbEnhancedClient dynamoEnhancedClient;
@@ -36,17 +37,20 @@ public class DynamoDBEnhancedResource {
     public CompletionStage<String> testAsyncDynamo() throws InterruptedException {
         LOG.info("Testing Async Dynamodb client with table: " + ASYNC_TABLE);
         String partitionKeyAsString = UUID.randomUUID().toString();
+        String rangeId = UUID.randomUUID().toString();
 
         DynamoDbAsyncTable<DynamoDBExampleTableEntry> exampleAsyncTable = dynamoEnhancedAsyncClient.table(ASYNC_TABLE,
                 TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
         DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
-        exampleTableEntry.setId(partitionKeyAsString);
+        exampleTableEntry.setKeyId(partitionKeyAsString);
+        exampleTableEntry.setRangeId(rangeId);
         exampleTableEntry.setPayload(PAYLOAD_VALUE);
 
         Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
-        return exampleAsyncTable.putItem(exampleTableEntry)
+        return exampleAsyncTable.createTable()
+                .thenCompose(t -> exampleAsyncTable.putItem(exampleTableEntry))
                 .thenCompose(t -> exampleAsyncTable.getItem(partitionKey))
                 .thenApply(p -> p.getPayload())
                 .exceptionally(th -> {
@@ -62,21 +66,23 @@ public class DynamoDBEnhancedResource {
         LOG.info("Testing Blocking Dynamodb client with table: " + BLOCKING_TABLE);
 
         String partitionKeyAsString = UUID.randomUUID().toString();
+        String rangeId = UUID.randomUUID().toString();
 
         DynamoDbTable<DynamoDBExampleTableEntry> exampleBlockingTable = dynamoEnhancedClient.table(BLOCKING_TABLE,
                 TableSchema.fromClass(DynamoDBExampleTableEntry.class));
 
-        DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
-        exampleTableEntry.setId(partitionKeyAsString);
-        exampleTableEntry.setPayload(PAYLOAD_VALUE);
+        exampleBlockingTable.createTable();
 
-        Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
+        DynamoDBExampleTableEntry exampleTableEntry = new DynamoDBExampleTableEntry();
+        exampleTableEntry.setKeyId(partitionKeyAsString);
+        exampleTableEntry.setRangeId(rangeId);
+        exampleTableEntry.setPayload(PAYLOAD_VALUE);
 
         exampleBlockingTable.putItem(exampleTableEntry);
 
-        GetItemEnhancedRequest request = GetItemEnhancedRequest.builder().key(partitionKey).build();
+        Key partitionKey = Key.builder().partitionValue(partitionKeyAsString).build();
 
-        DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(request);
+        DynamoDBExampleTableEntry existingTableEntry = exampleBlockingTable.getItem(partitionKey);
 
         if (existingTableEntry != null) {
             return existingTableEntry.getPayload();

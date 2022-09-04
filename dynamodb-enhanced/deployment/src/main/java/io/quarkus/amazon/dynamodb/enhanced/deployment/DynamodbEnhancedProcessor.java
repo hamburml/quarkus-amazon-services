@@ -32,6 +32,8 @@ import io.quarkus.gizmo.Gizmo;
 import io.quarkus.runtime.LaunchMode;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 
 public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
 
@@ -266,21 +268,19 @@ public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
             List<AmazonClientAsyncTransportBuildItem> asyncTransports,
             BuildProducer<SyntheticBeanBuildItem> syntheticBeans) {
 
-        /*
-         * createClientBuilders(commonRecorder,
-         * recorder.getAwsConfig(),
-         * recorder.getSdkConfig(),
-         * buildTimeConfig.sdk,
-         * syncTransports,
-         * asyncTransports,
-         * DynamoDbClientBuilder.class,
-         * (syncTransport) -> recorder.createSyncBuilder(syncTransport),
-         * DynamoDbAsyncClientBuilder.class,
-         * (asyncTransport) -> recorder.createAsyncBuilder(asyncTransport),
-         * null,
-         * null,
-         * syntheticBeans);
-         */
+        createClientBuilders(commonRecorder,
+                recorder.getAwsConfig(),
+                recorder.getSdkConfig(),
+                buildTimeConfig.sdk,
+                syncTransports,
+                asyncTransports,
+                DynamoDbClientBuilder.class,
+                (syncTransport) -> recorder.createSyncBuilder(syncTransport),
+                DynamoDbAsyncClientBuilder.class,
+                (asyncTransport) -> recorder.createAsyncBuilder(asyncTransport),
+                null,
+                null,
+                syntheticBeans);
 
     }
 }
