@@ -1,4 +1,4 @@
-package io.quarkus.amazon.dynamodb.deployment;
+package io.quarkus.amazon.dynamodb.enhanced.deployment;
 
 import javax.inject.Inject;
 
@@ -6,17 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkus.test.QuarkusUnitTest;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-public class DynamodbSyncApacheClientFullConfigTest {
+public class DynamodbClientProfileCredentialsProviderConfigTest {
 
     @Inject
-    DynamoDbClient client;
+    DynamoDbAsyncClient async;
+
+    @Inject
+    DynamoDbClient sync;
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
             .withApplicationRoot((jar) -> jar
-                    .addAsResource("sync-apache-full-config.properties", "application.properties"));
+                    .addAsResource("profile-credentials-config.properties", "application.properties"));
 
     @Test
     public void test() {

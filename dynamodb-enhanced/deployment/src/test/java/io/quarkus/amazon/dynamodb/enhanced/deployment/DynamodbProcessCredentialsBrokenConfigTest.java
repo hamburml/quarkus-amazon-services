@@ -1,4 +1,4 @@
-package io.quarkus.amazon.dynamodb.deployment;
+package io.quarkus.amazon.dynamodb.enhanced.deployment;
 
 import javax.inject.Inject;
 
@@ -11,7 +11,7 @@ import io.quarkus.test.QuarkusUnitTest;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
-public class DynamodbStaticCredentialsBrokenConfigTest {
+public class DynamodbProcessCredentialsBrokenConfigTest {
 
     @Inject
     DynamoDbAsyncClient async;
@@ -23,12 +23,12 @@ public class DynamodbStaticCredentialsBrokenConfigTest {
     static final QuarkusUnitTest config = new QuarkusUnitTest()
             .setExpectedException(RuntimeConfigurationError.class)
             .withApplicationRoot((jar) -> jar
-                    .addAsResource("static-credentials-broken-config.properties", "application.properties"));
+                    .addAsResource("process-credentials-broken-config.properties", "application.properties"));
 
     @Test
     public void test() {
         // should not be called, deployment exception should happen first:
-        // it's illegal to use STATIC credentials resolver without access key and secret key
+        // it's illegal to use PROCESS credentials resolver without command specified
         Assertions.fail();
     }
 }

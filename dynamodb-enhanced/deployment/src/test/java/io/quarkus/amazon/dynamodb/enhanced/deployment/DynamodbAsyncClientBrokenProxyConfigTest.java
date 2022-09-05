@@ -1,4 +1,4 @@
-package io.quarkus.amazon.dynamodb.deployment;
+package io.quarkus.amazon.dynamodb.enhanced.deployment;
 
 import javax.inject.Inject;
 
@@ -8,21 +8,24 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkus.amazon.common.runtime.RuntimeConfigurationError;
 import io.quarkus.test.QuarkusUnitTest;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
-public class DynamodbSyncApacheClientBrokenConfigTest {
+public class DynamodbAsyncClientBrokenProxyConfigTest {
 
     @Inject
-    DynamoDbClient client;
+    DynamoDbAsyncClient client;
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
             .setExpectedException(RuntimeConfigurationError.class)
             .withApplicationRoot((jar) -> jar
-                    .addAsResource("sync-apache-broken-config.properties", "application.properties"));
+                    .addAsResource("async-broken-proxy-config.properties", "application.properties"));
 
     @Test
     public void test() {
+        // should not be called, deployment exception should happen first.
+        client.getClass();
         Assertions.fail();
+
     }
 }

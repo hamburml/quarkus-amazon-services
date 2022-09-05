@@ -1,4 +1,4 @@
-package io.quarkus.amazon.dynamodb.deployment;
+package io.quarkus.amazon.dynamodb.enhanced.deployment;
 
 import javax.inject.Inject;
 

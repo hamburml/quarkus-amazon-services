@@ -31,8 +31,6 @@ import io.quarkus.deployment.builditem.FeatureBuildItem;
 import io.quarkus.runtime.RuntimeValue;
 import software.amazon.awssdk.awscore.client.builder.AwsClientBuilder;
 import software.amazon.awssdk.awscore.presigner.SdkPresigner;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.http.SdkHttpClient;
 import software.amazon.awssdk.http.async.SdkAsyncHttpClient;
 
@@ -152,72 +150,6 @@ abstract public class AbstractAmazonServiceProcessor {
                             client.getAsyncClassName().get(),
                             recorder.configureAsync(configName(), asyncConfig)));
         });
-    }
-
-    protected void createClientBuilders2(
-            AmazonClientRecorder recorder,
-            RuntimeValue<AwsConfig> awsConfigRuntime,
-            RuntimeValue<SdkConfig> sdkConfigRuntime,
-            SdkBuildTimeConfig sdkBuildConfig,
-            List<AmazonClientSyncTransportBuildItem> amazonClientSyncTransports,
-            List<AmazonClientAsyncTransportBuildItem> amazonClientAsyncTransports,
-            Class<?> syncClientBuilderClass,
-            Function<RuntimeValue<SdkHttpClient.Builder>, RuntimeValue<DynamoDbEnhancedClient.Builder>> syncClientBuilderFunction,
-            Class<?> asyncClientBuilderClass,
-            Function<RuntimeValue<SdkAsyncHttpClient.Builder>, RuntimeValue<DynamoDbEnhancedAsyncClient.Builder>> asyncClientBuilderFunction,
-            Class<?> presignerBuilderClass,
-            RuntimeValue<SdkPresigner.Builder> presignerBuilder,
-            BuildProducer<SyntheticBeanBuildItem> syntheticBeans) {
-        String configName = configName();
-
-        Optional<RuntimeValue<SdkHttpClient.Builder>> syncSdkHttpClientBuilder = amazonClientSyncTransports.stream()
-                .filter(c -> configName.equals(c.getAwsClientName()))
-                .map(c -> c.getClientBuilder())
-                .findFirst();
-        Optional<RuntimeValue<SdkAsyncHttpClient.Builder>> asyncSdkAsyncHttpClientBuilder = amazonClientAsyncTransports.stream()
-                .filter(c -> configName.equals(c.getAwsClientName()))
-                .map(c -> c.getClientBuilder())
-                .findFirst();
-
-        if (!syncSdkHttpClientBuilder.isPresent() && !asyncSdkAsyncHttpClientBuilder.isPresent() && presignerBuilder == null) {
-            return;
-        }
-
-        RuntimeValue<DynamoDbEnhancedClient.Builder> syncClientBuilder = syncSdkHttpClientBuilder.isPresent()
-                ? syncClientBuilderFunction.apply(syncSdkHttpClientBuilder.get())
-                : null;
-        RuntimeValue<DynamoDbEnhancedAsyncClient.Builder> asyncClientBuilder = asyncSdkAsyncHttpClientBuilder.isPresent()
-                ? asyncClientBuilderFunction.apply(asyncSdkAsyncHttpClientBuilder.get())
-                : null;
-
-        if (syncClientBuilder != null) {
-            syncClientBuilder = recorder.configure2(syncClientBuilder, awsConfigRuntime, sdkConfigRuntime,
-                    sdkBuildConfig, configName());
-            syntheticBeans.produce(SyntheticBeanBuildItem.configure(syncClientBuilderClass)
-                    .setRuntimeInit()
-                    .scope(ApplicationScoped.class)
-                    .runtimeValue(syncClientBuilder)
-                    .done());
-        }
-
-        if (asyncClientBuilder != null) {
-            asyncClientBuilder = recorder.configure3(asyncClientBuilder, awsConfigRuntime, sdkConfigRuntime,
-                    sdkBuildConfig, configName());
-            syntheticBeans.produce(SyntheticBeanBuildItem.configure(asyncClientBuilderClass)
-                    .setRuntimeInit()
-                    .scope(ApplicationScoped.class)
-                    .runtimeValue(asyncClientBuilder)
-                    .done());
-        }
-        if (presignerBuilder != null) {
-            presignerBuilder = recorder.configurePresigner(presignerBuilder, awsConfigRuntime, sdkConfigRuntime,
-                    configName());
-            syntheticBeans.produce(SyntheticBeanBuildItem.configure(presignerBuilderClass)
-                    .setRuntimeInit()
-                    .scope(ApplicationScoped.class)
-                    .runtimeValue(presignerBuilder)
-                    .done());
-        }
     }
 
     protected void createClientBuilders(

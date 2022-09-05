@@ -1,4 +1,4 @@
-package io.quarkus.amazon.dynamodb.deployment;
+package io.quarkus.amazon.dynamodb.enhanced.deployment;
 
 import javax.inject.Inject;
 
@@ -6,20 +6,21 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 import io.quarkus.test.QuarkusUnitTest;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 
-public class DynamodbSyncClientTlsKeyFileStoreConfigTest {
+public class DynamodbAsyncClientFullConfigTest {
 
     @Inject
-    DynamoDbClient client;
+    DynamoDbAsyncClient client;
 
     @RegisterExtension
     static final QuarkusUnitTest config = new QuarkusUnitTest()
             .withApplicationRoot((jar) -> jar
-                    .addAsResource("sync-tls-key-filestore-config.properties", "application.properties"));
+                    .addAsResource("async-full-config.properties", "application.properties"));
 
     @Test
     public void test() {
+        client.getClass();
         // Application should start with full config.
     }
 }
