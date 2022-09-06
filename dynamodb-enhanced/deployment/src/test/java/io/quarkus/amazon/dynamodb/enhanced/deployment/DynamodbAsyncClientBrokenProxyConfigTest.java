@@ -24,7 +24,6 @@ public class DynamodbAsyncClientBrokenProxyConfigTest {
     @Test
     public void test() {
         // should not be called, deployment exception should happen first.
-        client.getClass();
         Assertions.fail();
 
     }
