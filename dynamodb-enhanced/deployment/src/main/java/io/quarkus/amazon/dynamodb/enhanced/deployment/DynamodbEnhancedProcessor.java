@@ -30,9 +30,9 @@ import io.quarkus.deployment.builditem.LaunchModeBuildItem;
 import io.quarkus.deployment.builditem.nativeimage.RuntimeInitializedClassBuildItem;
 import io.quarkus.gizmo.Gizmo;
 import io.quarkus.runtime.LaunchMode;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
-import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
+import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClientBuilder;
+import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClientBuilder;
 
 public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
@@ -53,12 +53,12 @@ public class DynamodbEnhancedProcessor extends AbstractAmazonServiceProcessor {
 
     @Override
     protected DotName syncClientName() {
-        return DotName.createSimple(DynamoDbEnhancedClient.class.getName());
+        return DotName.createSimple(DynamoDbClient.class.getName());
     }
 
     @Override
     protected DotName asyncClientName() {
-        return DotName.createSimple(DynamoDbEnhancedAsyncClient.class.getName());
+        return DotName.createSimple(DynamoDbAsyncClient.class.getName());
     }
 
     @Override
