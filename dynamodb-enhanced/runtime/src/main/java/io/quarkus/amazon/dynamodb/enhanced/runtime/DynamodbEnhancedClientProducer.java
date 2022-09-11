@@ -1,4 +1,4 @@
-package test;
+package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;

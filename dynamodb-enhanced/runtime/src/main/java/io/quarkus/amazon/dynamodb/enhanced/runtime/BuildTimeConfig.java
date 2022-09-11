@@ -1,4 +1,4 @@
-package test;
+package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
 import io.quarkus.runtime.annotations.ConfigItem;
 import io.quarkus.runtime.annotations.ConfigPhase;

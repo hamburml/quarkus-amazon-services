@@ -1,4 +1,4 @@
-package test;
+package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
 import java.beans.PropertyDescriptor;
 import java.lang.invoke.MethodHandle;

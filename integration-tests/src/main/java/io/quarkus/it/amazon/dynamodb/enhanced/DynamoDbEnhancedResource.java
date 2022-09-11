@@ -13,8 +13,6 @@ import javax.ws.rs.Produces;
 import org.jboss.logging.Logger;
 
 import software.amazon.awssdk.enhanced.dynamodb.*;
-import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
-import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 
 @Path("/dynamodbenhanced")
 

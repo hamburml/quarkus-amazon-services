@@ -1,4 +1,4 @@
-package test;
+package io.quarkus.amazon.dynamodb.enhanced.runtime;
 
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
@@ -75,6 +75,7 @@ public class EnhancedProcessor {
      */
     private boolean shouldApplyClassTransformation(
             BuildTimeConfig buildTimeConfig, LaunchModeBuildItem launchModeBuildItem) {
+
         return buildTimeConfig.jvmTransformation
                 && launchModeBuildItem.getLaunchMode() != LaunchMode.NORMAL;
     }
