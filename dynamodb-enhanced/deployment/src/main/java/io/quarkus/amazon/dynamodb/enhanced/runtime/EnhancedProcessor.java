@@ -39,7 +39,7 @@ public class EnhancedProcessor {
     }
 
     @BuildStep
-    public void registerDynamoDbBeansForReflectiveAccess(
+    public void registerClassesForReflectiveAccess(
             CombinedIndexBuildItem combinedIndexBuildItem,
             BuildProducer<ReflectiveClassBuildItem> reflectiveClass) {
         for (AnnotationInstance i : combinedIndexBuildItem
@@ -49,6 +49,15 @@ public class EnhancedProcessor {
             reflectiveClass.produce(
                     new ReflectiveClassBuildItem(true, false, classInfo.name().toString()));
         }
+
+        // When we add DefaultAttributeConverterProvider and BeanTableSchemaAttributeTags here, we do not need the DynamodbEnhancedFeature in runtime module.
+        //reflectiveClass.produce(
+        //        new ReflectiveClassBuildItem(true, false,
+        //                "software.amazon.awssdk.enhanced.dynamodb.DefaultAttributeConverterProvider"));
+        //reflectiveClass.produce(
+        //        new ReflectiveClassBuildItem(true, false,
+        //                "software.amazon.awssdk.enhanced.dynamodb.internal.mapper.BeanTableSchemaAttributeTags"));
+
     }
 
     @BuildStep
