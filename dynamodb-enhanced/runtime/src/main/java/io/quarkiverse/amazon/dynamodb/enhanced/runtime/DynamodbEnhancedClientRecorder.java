@@ -18,7 +18,6 @@ import io.quarkus.runtime.annotations.Recorder;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedAsyncClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClient;
 import software.amazon.awssdk.enhanced.dynamodb.DynamoDbEnhancedClientExtension;
-import software.amazon.awssdk.enhanced.dynamodb.TableSchema;
 import software.amazon.awssdk.enhanced.dynamodb.internal.client.ExtensionResolver;
 import software.amazon.awssdk.services.dynamodb.DynamoDbAsyncClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -34,9 +33,16 @@ public class DynamodbEnhancedClientRecorder {
     }
 
     public void createTableSchema(List<Class<?>> tableSchemClasses) {
-        for (Class<?> tableSchemaClass : tableSchemClasses) {
-            TableSchema.fromClass(tableSchemaClass);
-        }
+        /*
+         * for (Class<?> tableSchemaClass : tableSchemClasses) {
+         *
+         * MethodHandles.Lookup lookup = MethodHandles.privateLookupIn(tableSchemaClass, MethodHandles.lookup());
+         *
+         * TableSchema.fromBean(BeanTableSchemaParams.builder(tableSchemaClass)
+         * .lookup(lookup)
+         * .build());
+         * }
+         */
     }
 
     public RuntimeValue<DynamoDbEnhancedClientExtension> createExtensionList() {
